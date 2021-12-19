@@ -133,6 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 294703753}
   - component: {fileID: 294703752}
+  - component: {fileID: 294703754}
   m_Layer: 0
   m_Name: SampleCar
   m_TagString: Untagged
@@ -203,8 +204,28 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &294703754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 294703751}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2403c6fd182aa9345aab242850c220be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  xLocation: 0
+  yLocation: 0
+  velocity: 0
+  acceleration: 0
+  maxTargetVelocity: 80
+  pathObjectToFollow: {fileID: 382885039}
+  listOfPoints: []
+  nextTarget: {x: 0, y: 0}
 --- !u!1 &382885039
 GameObject:
   m_ObjectHideFlags: 0
@@ -236,7 +257,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &382885041
 MonoBehaviour:
@@ -250,11 +271,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c82b5249b547fa74c813462483e93fad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xStarting: 0
+  xStarting: -30
   yStarting: 0
-  xEnding: 5
+  xEnding: 30
   yEnding: 0
-  unifiedSpacing: 1
+  unifiedSpacing: 5
   listOfPoints: []
   thiccnessOfCar: 2
   meshMaterial: {fileID: 2100000, guid: c4c6afa8589576241a46eaeafff73da3, type: 2}

@@ -24,7 +24,7 @@ public class PointCreator : MonoBehaviour
     private Vector2 ending;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         float xTemp = xStarting;
         float yTemp = yStarting;
