@@ -5,7 +5,7 @@ using UnityEngine;
 public class SampleCarBehaviour : MonoBehaviour
 {
     public float xLocation;
-    public float yLocation;
+    public float yLayer;
     public float velocity;
     public float acceleration;
     public float maxTargetVelocity;
@@ -21,7 +21,14 @@ public class SampleCarBehaviour : MonoBehaviour
     public GameObject pathObjectToFollow;
     public List<Transform> listOfPoints;
 
-    public Vector2 nextTarget;
+    //public Vector2 nextTarget;
+
+    private Transform target;
+
+    private float nextWantedLane;
+    private bool wantLineChange;
+
+    private int nextNode;
 
     // Start is called before the first frame update
     void Start()
@@ -38,8 +45,12 @@ public class SampleCarBehaviour : MonoBehaviour
 
         //
         transform.position = listOfPoints.First().position;
+
+        target = listOfPoints.ElementAt(1);
+        nextNode = 1;
+
         xLocation = transform.position.x;
-        yLocation = transform.position.y;
+        yLayer = transform.position.y;
 
         if(direction == Directions.Right)
         {
@@ -55,8 +66,12 @@ public class SampleCarBehaviour : MonoBehaviour
     {
         Accelerate();
         SlowDown();
-        Move();
-        CheckAndChangeNextPoint();
+        Move2();
+        LaneChangeDecission();
+        if (wantLineChange)
+        {
+            ChangeLane(nextWantedLane);
+        }
     }
 
     private void Accelerate()
@@ -79,8 +94,42 @@ public class SampleCarBehaviour : MonoBehaviour
         transform.position += transform.up * distanceToMove;
     }
 
-    private void CheckAndChangeNextPoint()
+    private void Move2()
     {
+        float step = velocity * Time.deltaTime; // calculate distance to move
 
+        if(transform.position != target.position)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, target.position, step);
+        }
+        else
+        {
+            nextNode += 1;
+            target = listOfPoints.ElementAt(nextNode);
+        }
+    }
+
+    private void ChangeLane(float yLayer)
+    {
+        // when Move()
+
+        // 1. calculate accurate distance in which car wants to change line
+        // 2. rotate by calucalted angle
+        // 3. move transform.up
+        // 4. when transform.position.y == wantedLayer, rotate to lane direction
+
+        // when Move2()
+
+        // 1. calculate accurate distance in which car wants to change line
+        // 2. move towards established point in new lane
+        // 3. when in target position, change list of points and establish index of current point
+    }
+
+    private void LaneChangeDecission()
+    {
+        // 1. decide which line is your target lane
+        // 2. check if there are cars that ride on this lane
+        // 3. check if there are in a safe distance
+        // 4. establish value of wantLineChange boolean
     }
 }
