@@ -66,6 +66,11 @@ public class PointCreator : MonoBehaviour
         vertices[2] = new Vector3(xEnding, yLayer + (thiccnessOfCar / 2));
         vertices[3] = new Vector3(xEnding, yLayer - (thiccnessOfCar / 2));
 
+        //vertices[4] = new Vector3(xStarting, yLayer - (thiccnessOfCar / 2) + 0.2f);
+        //vertices[5] = new Vector3(xStarting, yLayer + (thiccnessOfCar / 2) - 0.2f);
+        //vertices[6] = new Vector3(xEnding, yLayer - (thiccnessOfCar / 2) + 0.2f);
+        //vertices[7] = new Vector3(xEnding, yLayer - (thiccnessOfCar / 2) - 0.2f);
+
         mesh.vertices = vertices;
 
         mesh.triangles = new int[] { 0, 1, 2, 0, 2, 3 };
