@@ -14,12 +14,19 @@ public class HighwaySetup : MonoBehaviour
 
     void Awake()
     {
+        var listOfHighwayParts = new ListOfHighwayParts();
         SetUpHighway();
     }
 
     void SetUpHighway()
     {
+        var listOfParts = listOfHighwayParts.listOfHighwayPartsInside;
 
+        foreach(var item in listOfParts)
+        {
+            //TODO
+            //create logic of creating parts
+        }
     }
 
     private float ReturnFloatLayerValue(LayerOfLane layerOfLane)
