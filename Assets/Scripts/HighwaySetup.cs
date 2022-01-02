@@ -12,6 +12,10 @@ public class HighwaySetup : MonoBehaviour
 
     public GameObject highwayExitPrefab;
 
+
+    public GameObject carPrefab;
+    public GameObject truckPrefab;
+
     void Awake()
     {
         var listOfHighwayParts = new ListOfHighwayParts();
@@ -26,38 +30,101 @@ public class HighwaySetup : MonoBehaviour
         {
             //TODO
             //create logic of creating parts
+
+            // "3E-BA1-X1-0300-00000-070-70-I" sample
+           
+            CreateHighwayPart(item.Split('-'));
         }
     }
 
-    private float ReturnFloatLayerValue(LayerOfLane layerOfLane)
+    private void CreateHighwayPart(string[] infos)
+    {
+        var yLayer = ReturnFloatLayerValue(infos[0]);
+        var description = infos[1];
+        var distance = infos[3];
+        var xPosition = infos[4];
+        var carMaxVelocity = infos[5];
+        var truckMaxVelocity = infos[6];
+        var prefabType = ReturnTypeOfObjectToInstantiate(infos[7]);
+
+        if (prefabType == highwayLanePrefab || prefabType == highwayExitPrefab)
+        {
+            var prefabScript = prefabType.GetComponent<PointCreator>();
+            prefabScript.yLayer = yLayer;
+            prefabScript.distance = float.Parse(distance);
+            prefabScript.xPosition = float.Parse(xPosition);
+            prefabScript.carMaxVelocity = int.Parse(carMaxVelocity);
+            prefabScript.truckMaxVelocity = int.Parse(truckMaxVelocity);
+            //add tag if exit and
+            var instantiated = Instantiate(prefabType, new Vector3(float.Parse(xPosition), yLayer, 0f), Quaternion.identity);
+        }
+        else
+        {
+            var prefabScript = prefabType.GetComponent<EntranceBehaviour>();
+            prefabScript.yLayer = yLayer;
+            prefabScript.xPosition = float.Parse(xPosition);
+            prefabScript.carPrefab = carPrefab;
+            prefabScript.truckPrefab = truckPrefab;
+            if (infos[0].Contains("E"))
+            {
+                prefabScript.direction = "E";
+            }
+            else
+            {
+                prefabScript.direction = "W";
+            }
+            var instantiated = Instantiate(prefabType, new Vector3(float.Parse(xPosition), yLayer, 0f), Quaternion.identity);
+        }
+    }
+
+    private GameObject ReturnTypeOfObjectToInstantiate(string type)
+    {
+        if (type == "E")
+        {
+            Debug.Log("E");
+        }
+
+        switch (type)
+        {
+            case "I":
+                return highwayExitPrefab;
+            case "R":
+                return highwayLanePrefab;
+            case "E":
+                return highwayEntrancePrefab;
+        }
+        return highwayLanePrefab;
+    }
+
+    private float ReturnFloatLayerValue(string layerOfLane)
     {
         switch (layerOfLane)
         {
-            case LayerOfLane.FifthToEast:
+            case "5E":
                 return 0.0f;
 
-            case LayerOfLane.FourthToEast:
+            case "4E":
                 return 2.0f;
 
-            case LayerOfLane.ThirdToEast:
+            case "3E":
                 return 4.0f;
 
-            case LayerOfLane.SecondToEast:
+            case "2E":
                 return 6.0f;
 
-            case LayerOfLane.FirstToEast:
+            case "1E":
                 return 8.0f;
 
-            case LayerOfLane.FirstToWest:
+            case "1W":
                 return 10.5f;
 
-            case LayerOfLane.SecondToWest:
+            case "2W":
                 return 12.5f;
 
-            case LayerOfLane.ThirdToWest:
+            case "3W":
                 return 14.5f;
 
-            case LayerOfLane.FourthToWest:
+            case "4W":
                 return 16.5f;
         }
         return 0.0f;
@@ -85,7 +152,7 @@ public class ListOfHighwayParts
     // String ID: "ND-XXX-PP-LLLL-SSSSS-CCC-VV-T";
     // N = lane number, D = direction, XXX = 3 character long intersection code, PP = part indication: name (optional) and number, LLLL = length filled with zeros,
     // SSSSS = xStart filled with zeros, CCC = maxVelocityCars filled with zeros, VV = maxVelocityTrucks, T = type of highway
-    public List<String> listOfHighwayPartsInside = new List<String>
+    public List<string> listOfHighwayPartsInside = new List<string>
         {
             // Kraków Balice I interchange going east
             "3E-BA1-X1-0300-00000-070-70-I",

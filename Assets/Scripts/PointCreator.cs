@@ -4,31 +4,28 @@ using UnityEngine;
 
 public class PointCreator : MonoBehaviour
 {
-    public float xStarting;
-    public float xEnding;
+    // highway setup section
     public float yLayer;
+    public float distance;
+    public float xPosition;
+    public int carMaxVelocity;
+    public int truckMaxVelocity;
 
-    public float unifiedSpacing;
+    private float unifiedSpacing = 10f;
 
     public List<Vector2> listOfPoints;
 
-    public float thiccnessOfCar = 2f;
+    private float thiccnessOfCar = 2f;
 
     public Material meshMaterial;
 
     public GameObject prefabOfPoints;
 
-    private Vector2 starting;
-    private Vector2 ending;
-
     // Start is called before the first frame update
     void Awake()
     {
-        starting = new Vector2(xStarting, yLayer);
-        ending = new Vector2(xEnding, yLayer);
-
-        var difference = ending - starting;
-        var distance = Vector2.Distance(ending, starting);
+        var starting = new Vector2(xPosition, yLayer);
+        var ending = new Vector2(xPosition + distance, yLayer);
 
         //How much points will fit between
         var howMuchPoints = distance / unifiedSpacing;
@@ -41,16 +38,16 @@ public class PointCreator : MonoBehaviour
 
         Debug.Log(angle);
 
-        CreatePointWithParameters(xStarting, yLayer);
+        CreatePointWithParameters(xPosition, yLayer);
 
-        float tempValue = xStarting;
-        while (tempValue < xEnding - unifiedSpacing)
+        float tempValue = xPosition;
+        while (tempValue < (xPosition + distance - unifiedSpacing))
         {
             tempValue = tempValue + unifiedSpacing;
             CreatePointWithParameters(tempValue, yLayer);
         }
 
-        CreatePointWithParameters(xEnding, yLayer);
+        CreatePointWithParameters(xPosition + distance, yLayer);
 
         GenerateMesh();
     }
@@ -61,10 +58,10 @@ public class PointCreator : MonoBehaviour
 
         Vector3[] vertices = new Vector3[4];
 
-        vertices[0] = new Vector3(xStarting, yLayer - (thiccnessOfCar / 2));
-        vertices[1] = new Vector3(xStarting, yLayer + (thiccnessOfCar / 2));
-        vertices[2] = new Vector3(xEnding, yLayer + (thiccnessOfCar / 2));
-        vertices[3] = new Vector3(xEnding, yLayer - (thiccnessOfCar / 2));
+        vertices[0] = new Vector3(0, 0 - (thiccnessOfCar / 2));
+        vertices[1] = new Vector3(0, 0 + (thiccnessOfCar / 2));
+        vertices[2] = new Vector3(0 + distance, 0 + (thiccnessOfCar / 2));
+        vertices[3] = new Vector3(0 + distance, 0 - (thiccnessOfCar / 2));
 
         //vertices[4] = new Vector3(xStarting, yLayer - (thiccnessOfCar / 2) + 0.2f);
         //vertices[5] = new Vector3(xStarting, yLayer + (thiccnessOfCar / 2) - 0.2f);

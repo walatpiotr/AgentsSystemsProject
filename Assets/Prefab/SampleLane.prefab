@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1886853185584835150}
   m_Layer: 0
   m_Name: SampleLane
-  m_TagString: Untagged
+  m_TagString: highwayLane
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -45,12 +45,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c82b5249b547fa74c813462483e93fad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  xStarting: -30
-  xEnding: 30
-  yLayer: 0
-  unifiedSpacing: 10
+  yLayer: 12.5
+  distance: 865
+  xPosition: 0
+  carMaxVelocity: 90
+  truckMaxVelocity: 80
   listOfPoints: []
-  thiccnessOfCar: 2
   meshMaterial: {fileID: 2100000, guid: c4c6afa8589576241a46eaeafff73da3, type: 2}
   prefabOfPoints: {fileID: 504372108782306628, guid: 126433c75ef27af4eacb0d3db7805561, type: 3}
 --- !u!33 &1886853185584835151

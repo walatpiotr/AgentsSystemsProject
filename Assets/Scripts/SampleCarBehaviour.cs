@@ -30,21 +30,7 @@ public class SampleCarBehaviour : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        foreach (Transform child in pathObjectToFollow.transform)
-        {
-            listOfPoints.Add(child);
-        }
-
-        Debug.Log(listOfPoints);
-
-        //temp solution
-        velocity = maxTargetVelocity;
-
-        //
-        transform.position = listOfPoints.First().position;
-
-        target = listOfPoints.ElementAt(1);
-        nextNode = 1;
+        
 
         xLocation = transform.position.x;
         yLayer = transform.position.y;
@@ -89,10 +75,10 @@ public class SampleCarBehaviour : MonoBehaviour
 
     private void Move()
     {
-        var unifiedSpaceing = pathObjectToFollow.GetComponent<PointCreator>().unifiedSpacing;
+        var unifiedSpacing = 10f;
         var meterPerSecond = 0.2777f;
 
-        var distanceToMove = (meterPerSecond * velocity) / (unifiedSpaceing * 50);
+        var distanceToMove = (meterPerSecond * velocity) / (unifiedSpacing * 50);
 
         transform.position += transform.up * distanceToMove;
     }
@@ -103,12 +89,19 @@ public class SampleCarBehaviour : MonoBehaviour
 
         transform.position = Vector3.MoveTowards(transform.position, target.position, step);
 
-        if ((transform.position == target.position) && ((nextNode+1) < listOfPoints.Count))
+        if ((transform.position == target.position) && (((nextNode+1) < listOfPoints.Count) || (nextNode - 1) == -1))
         {
-            nextNode += 1;
+            if(direction == Directions.Left)
+            {
+                nextNode -= 1;
+            }
+            else
+            {
+                nextNode += 1;
+            }
             target = listOfPoints.ElementAt(nextNode);
         }
-        if ((transform.position == target.position) && ((nextNode+1) == listOfPoints.Count))
+        if ((transform.position == target.position) && (((nextNode+1) == listOfPoints.Count)||(nextNode-1) == -1))
         {
             // TODO
             // search for new lane
@@ -153,5 +146,15 @@ public class SampleCarBehaviour : MonoBehaviour
     private void PrintVelocity()
     {
         velocityText.text = velocity.ToString() + "km/h";
+    }
+
+    public void SetUpLane(Transform nearestPoint, int index)
+    {
+        pathObjectToFollow = nearestPoint.parent.gameObject;
+        foreach (Transform child in pathObjectToFollow.transform)
+        {
+            listOfPoints.Add(child);
+        }
+        nextNode = index+1;
     }
 }
