@@ -52,10 +52,10 @@ public class HighwaySetup : MonoBehaviour
 [Serializable]
 public class ListOfHighwayParts
 {
-    // Tuple: enum type, length, layer, maxVelocityCars, maxVelocityTrucks
-    public List<Tuple<TypeOfHighway, int, LayerOfLane, int, int>> listOfHighwayPartsInside = new List<Tuple<TypeOfHighway, int, LayerOfLane, int, int>>
+    // Tuple: enum type, length, layer, xStart, maxVelocityCars, maxVelocityTrucks
+    public List<Tuple<TypeOfHighway, int, LayerOfLane, int, int, int>> listOfHighwayPartsInside = new List<Tuple<TypeOfHighway, int, LayerOfLane, int, int, int>>
         {
-            new Tuple<TypeOfHighway, int, LayerOfLane, int, int>(TypeOfHighway.Lane, 3300, LayerOfLane.ThirdToEast, 140, 80)
+            new Tuple<TypeOfHighway, int, LayerOfLane, int, int, int>(TypeOfHighway.Lane, 3300, LayerOfLane.ThirdToEast, 0, 140, 80)
         //TODO enter all lanes with parameters
 
         };
