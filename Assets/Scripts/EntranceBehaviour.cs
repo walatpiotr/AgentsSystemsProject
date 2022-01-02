@@ -10,6 +10,8 @@ public class EntranceBehaviour : MonoBehaviour
     public GameObject carPrefab;
     public GameObject truckPrefab;
 
+    public float yLayer;
+
     private float timer;
 
     void Awake()
@@ -19,22 +21,29 @@ public class EntranceBehaviour : MonoBehaviour
 
     void GenerateMesh()
     {
+        var transformPosition = transform.position;
+
         Mesh mesh = new Mesh();
 
-        Vector3[] vertices = new Vector3[4];
+        Vector3[] vertices = new Vector3[6];
 
-        vertices[0] = new Vector3(transform.position.x - 2f + 0.5f, transform.position.y + 2 - 1);
-        vertices[1] = new Vector3(transform.position.x - 2f, transform.position.y - 2 + 1);
-        vertices[2] = new Vector3(transform.position.x + 2f - 0.5f, transform.position.y - 2 + 1);
-        vertices[3] = new Vector3(transform.position.x + 2f, transform.position.y + 2 - 1);
+        vertices[0] = new Vector3(transform.position.x - 1f, yLayer - 1f + 2f);
+        vertices[1] = new Vector3(transform.position.x - 1f, yLayer + 1f + 2f);
+        vertices[2] = new Vector3(transform.position.x + 1f, yLayer + 1f + 2f);
+        vertices[3] = new Vector3(transform.position.x + 1f, yLayer - 1f + 2f);
+
+        vertices[4] = new Vector3(transform.position.x - 10f, yLayer - 1f + 2f);
+        vertices[5] = new Vector3(transform.position.x + 10f, yLayer + 1f + 2f);
 
         mesh.vertices = vertices;
 
-        mesh.triangles = new int[] { 0, 1, 2, 0, 2, 3 };
+        mesh.triangles = new int[] { 0, 1, 2, 0, 2, 3, 3, 2, 5, 4, 1, 0};
 
         GetComponent<MeshFilter>().mesh = mesh;
 
         GetComponent<MeshRenderer>().material = meshMaterial;
+
+        this.transform.position = transformPosition;
     }
 
     void FixedUpdate()
