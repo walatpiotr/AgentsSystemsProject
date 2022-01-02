@@ -219,13 +219,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   xLocation: 0
-  yLocation: 0
+  yLayer: 0
   velocity: 0
   acceleration: 0
   maxTargetVelocity: 80
+  direction: 0
   pathObjectToFollow: {fileID: 382885039}
   listOfPoints: []
-  nextTarget: {x: 0, y: 0}
 --- !u!1 &382885039
 GameObject:
   m_ObjectHideFlags: 0
@@ -272,10 +272,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   xStarting: -30
-  yStarting: 0
   xEnding: 30
-  yEnding: 0
-  unifiedSpacing: 5
+  yLayer: 0
+  unifiedSpacing: 10
   listOfPoints: []
   thiccnessOfCar: 2
   meshMaterial: {fileID: 2100000, guid: c4c6afa8589576241a46eaeafff73da3, type: 2}
