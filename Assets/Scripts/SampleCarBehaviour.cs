@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using TMPro;
 
 public class SampleCarBehaviour : MonoBehaviour
 {
@@ -9,26 +10,22 @@ public class SampleCarBehaviour : MonoBehaviour
     public float velocity;
     public float acceleration;
     public float maxTargetVelocity;
-
+    public TextMeshProUGUI velocityText;
     public enum Directions
     {
         Right,
         Left
     }
-
     public Directions direction;
-
     public GameObject pathObjectToFollow;
     public List<Transform> listOfPoints;
+    public Transform target;
+    public float targetX;
+    public int nextNode;
 
-    //public Vector2 nextTarget;
-
-    private Transform target;
-
+    private float velocityMetersPerSecond;
     private float nextWantedLane;
     private bool wantLineChange;
-
-    private int nextNode;
 
     // Start is called before the first frame update
     void Start()
@@ -60,6 +57,8 @@ public class SampleCarBehaviour : MonoBehaviour
         {
             transform.rotation = Quaternion.Euler(0, 0, 90f);
         }
+
+        velocityMetersPerSecond = CalculateToMetersPerSecond(velocity);
     }
 
     private void FixedUpdate()
@@ -72,6 +71,10 @@ public class SampleCarBehaviour : MonoBehaviour
         {
             ChangeLane(nextWantedLane);
         }
+        EstablishVelocityInKilometers();
+        PrintVelocity();
+
+        targetX = target.position.x;
     }
 
     private void Accelerate()
@@ -96,16 +99,19 @@ public class SampleCarBehaviour : MonoBehaviour
 
     private void Move2()
     {
-        float step = velocity * Time.deltaTime; // calculate distance to move
+        float step = velocityMetersPerSecond * Time.deltaTime; // calculate distance to move
 
-        if(transform.position != target.position)
-        {
-            transform.position = Vector3.MoveTowards(transform.position, target.position, step);
-        }
-        else
+        transform.position = Vector3.MoveTowards(transform.position, target.position, step);
+
+        if ((transform.position == target.position) && ((nextNode+1) < listOfPoints.Count))
         {
             nextNode += 1;
             target = listOfPoints.ElementAt(nextNode);
+        }
+        if ((transform.position == target.position) && ((nextNode+1) == listOfPoints.Count))
+        {
+            // TODO
+            // search for new lane
         }
     }
 
@@ -131,5 +137,21 @@ public class SampleCarBehaviour : MonoBehaviour
         // 2. check if there are cars that ride on this lane
         // 3. check if there are in a safe distance
         // 4. establish value of wantLineChange boolean
+    }
+
+    private float CalculateToMetersPerSecond(float velocityInKilometers)
+    {
+        return velocityInKilometers / 3.6f;
+    }
+
+    // method only for purpose of displaying velocity
+    private void EstablishVelocityInKilometers()
+    {
+        velocity = velocityMetersPerSecond * 3.6f;
+    }
+
+    private void PrintVelocity()
+    {
+        velocityText.text = velocity.ToString() + "km/h";
     }
 }
