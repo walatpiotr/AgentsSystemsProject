@@ -142,11 +142,6 @@ public class SampleCarBehaviour : MonoBehaviour
         // 4. establish value of wantLineChange boolean
     }
 
-    private float CalculateToMetersPerSecond(float velocityInKilometers)
-    {
-        return velocityInKilometers / 3.6f;
-    }
-
     private void PrintVelocity()
     {
         velocityText.text = GetVelocity().ToString() + "km/h";
