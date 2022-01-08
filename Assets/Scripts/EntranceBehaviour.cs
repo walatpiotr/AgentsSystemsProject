@@ -91,7 +91,7 @@ public class EntranceBehaviour : MonoBehaviour
         }
         RaycastHit2D hitBackward = Physics2D.Raycast(nearestPoint.position, backwardDirection);
         RaycastHit2D hitForward = Physics2D.Raycast(nearestPoint.position, forwardDirection);
-        GameObject lane = nearestPoint.parent.gameObject;
+        PointCreator lane = nearestPoint.parent.GetComponent<PointCreator>();
         // distance < (2v1 - v2p - v2k)(v2k - v2p)/2a2 + buffer [km i h]
         // we assume v1 = lane.carMaxVelocity; buffer = v1; v2p = 70km/h 
         if((hitBackward.collider != null))
