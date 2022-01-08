@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System;
 using UnityEngine;
 using TMPro;
 
@@ -32,6 +33,9 @@ public class SampleCarBehaviour : MonoBehaviour
     private float velocityMetersPerSecond;
     private float nextWantedLane;
     private bool wantLineChange;
+    private const float UNIFIED_SPACING = 10f;
+
+    private float timeInRandomBreaking;
 
     // Start is called before the first frame update
     void Start()
@@ -53,12 +57,17 @@ public class SampleCarBehaviour : MonoBehaviour
         if(velocityMetersPerSecond > 340f || velocityMetersPerSecond < 0f)
         {
             velocityMetersPerSecond = 0f;
-        } 
+        }
+
+        timeInRandomBreaking = 0f;
     }
 
     private void FixedUpdate()
     {
-        Accelerate();
+        if(timeInRandomBreaking == 0f)
+        {
+            Accelerate();
+        }
         SlowDown();
         Move();
         LaneChangeDecission();
@@ -83,16 +92,60 @@ public class SampleCarBehaviour : MonoBehaviour
 
     private void Accelerate()
     {
-
+        float maxVelocityInMeters = maxTargetVelocity / 3.6f;
+        if(velocityMetersPerSecond < maxVelocityInMeters)
+        {
+            if(velocityMetersPerSecond + UNIFIED_SPACING <= maxVelocityInMeters)
+            {
+                velocityMetersPerSecond += UNIFIED_SPACING;
+            }
+            else
+            {
+                velocityMetersPerSecond = maxVelocityInMeters;
+            }
+        }
     }
 
     private void SlowDown()
     {
-        var detected = DetectCars();
-        if(detected != null)
+        // Part 1: Avoid collision
+        RaycastHit2D detected;
+        try
         {
+            detected = DetectCars();
             // set velocity so the distance stays consistent with the law
-            velocityMetersPerSecond = (detected.distance - velocityMetersPerSecond) / Time.deltaTime;
+            if(detected.distance - GetVelocity() > 0)
+            {
+                velocityMetersPerSecond = (detected.distance - GetVelocity()) / Time.deltaTime;
+            }
+            else
+            {
+                velocityMetersPerSecond = UNIFIED_SPACING;
+            }            
+        } catch(Exception e) {
+            if(!e.Message.Equals("Undetected"))
+            {
+                throw e;
+            }
+        }
+
+        // Part 2: Randomize
+        // if speed higher than one unit (unified spacing)
+        if(velocityMetersPerSecond > UNIFIED_SPACING || timeInRandomBreaking > 0f)
+        {
+            if(timeInRandomBreaking == 0f && UnityEngine.Random.value < 0.0003)
+            {
+                timeInRandomBreaking += Time.deltaTime;
+            }
+            if(timeInRandomBreaking > 0f && timeInRandomBreaking < 1f)
+            {
+                velocityMetersPerSecond -= UNIFIED_SPACING * Time.deltaTime;
+                timeInRandomBreaking += Time.deltaTime;
+            }
+            else if(timeInRandomBreaking >= 1f || velocityMetersPerSecond < UNIFIED_SPACING)
+            {
+                timeInRandomBreaking = 0f;
+            }
         }
     }
 
@@ -124,16 +177,19 @@ public class SampleCarBehaviour : MonoBehaviour
     private RaycastHit2D DetectCars()
     {
         Vector2 convertedDirection = direction == Directions.Right ? Vector2.right : Vector2.left;
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, convertedDirection);
-        if(hit.collider != null)
+        Vector2 offset = vehicleType == VehicleType.Car ? convertedDirection * 4 : convertedDirection * 20;
+        Vector3 offset3 = new Vector3(offset.x, offset.y, 0);
+        RaycastHit2D hit = Physics2D.Raycast(transform.position + offset3, convertedDirection);
+        // if another car is closer than one step of movement + free space required by law
+        Debug.DrawLine(transform.position, transform.position + offset3, Color.magenta);
+        if((hit.collider != null) && (hit.collider.tag == "car" || hit.collider.tag == "truck") && (hit.distance < velocityMetersPerSecond * Time.deltaTime + GetVelocity()))
         {
-            // if another car is closer than one step of movement + free space required by law
-            if(hit.distance < velocityMetersPerSecond * Time.deltaTime + velocityMetersPerSecond)
-            {
-                return hit;
-            }
+            return hit;
         }
-        return null;
+        else
+        {
+            throw new Exception("Undetected");
+        }
     }
 
     private void ChangeLane(float yLayer)

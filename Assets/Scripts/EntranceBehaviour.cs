@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class EntranceBehaviour : MonoBehaviour
 {
-    public Tuple<float, float> randomRangeForSpawning = new Tuple<float, float>(3.0f, 8.0f);
+    public Tuple<float, float> randomRangeForSpawning = new Tuple<float, float>(0.0f, 2.0f);
 
     public Material meshMaterial;
 
@@ -77,7 +77,7 @@ public class EntranceBehaviour : MonoBehaviour
         // TODO
         // decide which car to spawn : car or truck - determine probability
         SampleCarBehaviour carBehaviourScript;
-        if(UnityEngine.Random.Range(randomRangeForSpawning.Item1, randomRangeForSpawning.Item2) < 0.3)
+        if(UnityEngine.Random.value >= 0.3)
         {
             carBehaviourScript = carPrefab.GetComponent<SampleCarBehaviour>();
         }
@@ -97,6 +97,7 @@ public class EntranceBehaviour : MonoBehaviour
         }
 
         carBehaviourScript.pathObjectToFollow = carBehaviourScript.target.parent.gameObject;
+        // TODO: change to SampleCarBehaviour.Setup() function
         int i = 0;
         carBehaviourScript.listOfPoints = new List<Transform>() { };
         foreach (Transform child in carBehaviourScript.pathObjectToFollow.transform)
