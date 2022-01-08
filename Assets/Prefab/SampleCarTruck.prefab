@@ -47,6 +47,10 @@ PrefabInstance:
       propertyPath: m_horizontalMapping
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7322784480813322241, guid: 707950990b8e0c949b154dae9b5ac71a, type: 3}
+      propertyPath: vehicleType
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7322784480813322242, guid: 707950990b8e0c949b154dae9b5ac71a, type: 3}
       propertyPath: m_RootOrder
       value: 0
