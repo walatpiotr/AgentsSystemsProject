@@ -21,6 +21,8 @@ public class EntranceBehaviour : MonoBehaviour
     private Transform nearestPoint;
     private int indexOfNearest = 0;
     private GameObject nearest;
+    private const float UNIFIED_SPACING = 10f;
+    private const float SPAWNING_SPEED = 70f;
 
     void Awake()
     {
@@ -63,13 +65,51 @@ public class EntranceBehaviour : MonoBehaviour
     {
         if (timer == 0f)
         {
-            // TODO
-            // add method to check if lane is clear. if not set timer and dont spawn car
-            SpawnCar();
+            if(CheckLane())
+            {
+                SpawnCar();
+            }
             SetupTimer();
         }
 
-        Timer();
+        TimerTick();
+    }
+
+    bool CheckLane()
+    {
+        Vector2 backwardDirection;
+        Vector2 forwardDirection;
+        if(nearestPoint.position.y < 9f)
+        {
+            backwardDirection = Vector2.left;
+            forwardDirection = Vector2.right;
+        }
+        else
+        {
+            backwardDirection = Vector2.right;
+            forwardDirection = Vector2.left;
+        }
+        RaycastHit2D hitBackward = Physics2D.Raycast(nearestPoint.position, backwardDirection);
+        RaycastHit2D hitForward = Physics2D.Raycast(nearestPoint.position, forwardDirection);
+        GameObject lane = nearestPoint.parent.gameObject;
+        // distance < (2v1 - v2p - v2k)(v2k - v2p)/2a2 + buffer [km i h]
+        // we assume v1 = lane.carMaxVelocity; buffer = v1; v2p = 70km/h 
+        if((hitBackward.collider != null))
+        {
+            if(hitBackward.collider.tag == "car" && (hitBackward.distance < ((2*lane.carMaxVelocity - SPAWNING_SPEED - lane.carMaxVelocity)*(lane.carMaxVelocity - SPAWNING_SPEED))/(2*UNIFIED_SPACING*3.6f)/1000+lane.carMaxVelocity))
+            {
+                return false;
+            }
+            if(hitBackward.collider.tag == "truck" && (hitBackward.distance < ((2*lane.carMaxVelocity - SPAWNING_SPEED - lane.truckMaxVelocity)*(lane.truckMaxVelocity - SPAWNING_SPEED))/(2*UNIFIED_SPACING*3.6f)/1000+lane.carMaxVelocity))
+            {
+                return false;
+            }
+        }
+        if((hitForward.collider != null) && (hitForward.collider.tag == "car" || hitForward.collider.tag == "truck") && (hitForward.distance < SPAWNING_SPEED))
+        {
+            return false;
+        }
+        return true;
     }
 
     void SpawnCar()
@@ -126,7 +166,7 @@ public class EntranceBehaviour : MonoBehaviour
         {
             spawnedCar = Instantiate(truckPrefab, transform.position, Quaternion.identity);
         }
-        spawnedCar.GetComponent<SampleCarBehaviour>().SetVelocity(70f);
+        spawnedCar.GetComponent<SampleCarBehaviour>().SetVelocity(SPAWNING_SPEED);
         // parameters to setup: current velocity and target point, assign list of points (lane)
     }
 
@@ -159,7 +199,7 @@ public class EntranceBehaviour : MonoBehaviour
         timer = UnityEngine.Random.Range(randomRangeForSpawning.Item1, randomRangeForSpawning.Item2);
     }
 
-    void Timer()
+    void TimerTick()
     {
         timer -= Time.deltaTime;
     }

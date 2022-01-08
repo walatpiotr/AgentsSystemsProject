@@ -95,9 +95,9 @@ public class SampleCarBehaviour : MonoBehaviour
         float maxVelocityInMeters = maxTargetVelocity / 3.6f;
         if(velocityMetersPerSecond < maxVelocityInMeters)
         {
-            if(velocityMetersPerSecond + UNIFIED_SPACING <= maxVelocityInMeters)
+            if(velocityMetersPerSecond + UNIFIED_SPACING * Time.deltaTime <= maxVelocityInMeters)
             {
-                velocityMetersPerSecond += UNIFIED_SPACING;
+                velocityMetersPerSecond += UNIFIED_SPACING * Time.deltaTime;
             }
             else
             {
