@@ -16,6 +16,7 @@ public class SampleCarBehaviour : MonoBehaviour
     public float acceleration;
     public float maxTargetVelocity;
     public TextMeshProUGUI velocityText;
+    public BoxCollider2D collider;
     public enum Directions
     {
         Right,
@@ -49,7 +50,7 @@ public class SampleCarBehaviour : MonoBehaviour
             transform.rotation = Quaternion.Euler(0, 0, 90f);
         }
 
-        if(velocityMetersPerSecond == null)
+        if(velocityMetersPerSecond > 340f || velocityMetersPerSecond < 0f)
         {
             velocityMetersPerSecond = 0f;
         } 
@@ -90,7 +91,8 @@ public class SampleCarBehaviour : MonoBehaviour
         var detected = DetectCars();
         if(detected != null)
         {
-            // reduce velocity
+            // set velocity so the distance stays consistent with the law
+            velocityMetersPerSecond = (detected.distance - velocityMetersPerSecond) / Time.deltaTime;
         }
     }
 
@@ -119,15 +121,16 @@ public class SampleCarBehaviour : MonoBehaviour
         }
     }
 
-    private Collider2D DetectCars()
+    private RaycastHit2D DetectCars()
     {
         Vector2 convertedDirection = direction == Directions.Right ? Vector2.right : Vector2.left;
         RaycastHit2D hit = Physics2D.Raycast(transform.position, convertedDirection);
         if(hit.collider != null)
         {
-            if(hit.distance <= velocityMetersPerSecond * Time.deltaTime)
+            // if another car is closer than one step of movement + free space required by law
+            if(hit.distance < velocityMetersPerSecond * Time.deltaTime + velocityMetersPerSecond)
             {
-                return hit.collider;
+                return hit;
             }
         }
         return null;
