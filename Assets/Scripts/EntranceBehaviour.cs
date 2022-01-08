@@ -77,7 +77,6 @@ public class EntranceBehaviour : MonoBehaviour
         // TODO
         // decide which car to spawn : car or truck
         var carBehaviourScript = carPrefab.GetComponent<SampleCarBehaviour>();
-        carBehaviourScript.SetVelocity(70f);
         carBehaviourScript.target = nearestPoint;
 
         if (direction == "E")
@@ -109,7 +108,8 @@ public class EntranceBehaviour : MonoBehaviour
             i++;
         }
         //carBehaviourScript.SetUpLane(nearestPoint, indexOfNearest);
-        Instantiate(carPrefab, transform.position, Quaternion.identity);
+        var spawnedCar = Instantiate(carPrefab, transform.position, Quaternion.identity);
+        spawnedCar.GetComponent<SampleCarBehaviour>().SetVelocity(70f);
         // parameters to setup: current velocity and target point, assign list of points (lane)
     }
 
