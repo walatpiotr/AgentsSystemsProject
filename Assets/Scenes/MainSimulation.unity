@@ -399,4 +399,4 @@ MonoBehaviour:
   highwayEntrancePrefab: {fileID: 9132573602137013452, guid: 79f66066054f77c49a124df5a1bb6439, type: 3}
   highwayExitPrefab: {fileID: 1886853185584835154, guid: 221d14d79e0328c4d831fe4e6b66a812, type: 3}
   carPrefab: {fileID: 7322784480813322252, guid: 707950990b8e0c949b154dae9b5ac71a, type: 3}
-  truckPrefab: {fileID: 7322784480813322252, guid: 707950990b8e0c949b154dae9b5ac71a, type: 3}
+  truckPrefab: {fileID: 890788556774561889, guid: 012deb20d55649e4ab1b0c7f6be45d21, type: 3}
