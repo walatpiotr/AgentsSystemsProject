@@ -332,7 +332,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   xLocation: 0
   yLayer: 0
-  velocity: 0
   acceleration: 0
   maxTargetVelocity: 80
   velocityText: {fileID: 5284134305695985630}

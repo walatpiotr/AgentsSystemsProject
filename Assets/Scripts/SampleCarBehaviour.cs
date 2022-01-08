@@ -7,7 +7,6 @@ public class SampleCarBehaviour : MonoBehaviour
 {
     public float xLocation;
     public float yLayer;
-    public float velocity;
     public float acceleration;
     public float maxTargetVelocity;
     public TextMeshProUGUI velocityText;
@@ -44,23 +43,35 @@ public class SampleCarBehaviour : MonoBehaviour
             transform.rotation = Quaternion.Euler(0, 0, 90f);
         }
 
-        velocityMetersPerSecond = CalculateToMetersPerSecond(velocity);
+        if(velocityMetersPerSecond == null)
+        {
+            velocityMetersPerSecond = 0f;
+        } 
     }
 
     private void FixedUpdate()
     {
         Accelerate();
         SlowDown();
-        Move2();
+        Move();
         LaneChangeDecission();
         if (wantLineChange)
         {
             ChangeLane(nextWantedLane);
         }
-        EstablishVelocityInKilometers();
         PrintVelocity();
 
         targetX = target.position.x;
+    }
+
+    public void SetVelocity(float velocityInKilometers)
+    {
+        velocityMetersPerSecond = velocityInKilometers / 3.6f;
+    }
+
+    public float GetVelocity()
+    {
+        return velocityMetersPerSecond * 3.6f;
     }
 
     private void Accelerate()
@@ -70,20 +81,14 @@ public class SampleCarBehaviour : MonoBehaviour
 
     private void SlowDown()
     {
-
+        var detected = DetectCars();
+        if(detected != null)
+        {
+            // reduce velocity
+        }
     }
 
     private void Move()
-    {
-        var unifiedSpacing = 10f;
-        var meterPerSecond = 0.2777f;
-
-        var distanceToMove = (meterPerSecond * velocity) / (unifiedSpacing * 50);
-
-        transform.position += transform.up * distanceToMove;
-    }
-
-    private void Move2()
     {
         float step = velocityMetersPerSecond * Time.deltaTime; // calculate distance to move
 
@@ -108,7 +113,7 @@ public class SampleCarBehaviour : MonoBehaviour
         }
     }
 
-    private void DetectCars()
+    private Collider2D DetectCars()
     {
         Vector2 convertedDirection = direction == Directions.Right ? Vector2.right : Vector2.left;
         RaycastHit2D hit = Physics2D.Raycast(transform.position, convertedDirection);
@@ -116,22 +121,14 @@ public class SampleCarBehaviour : MonoBehaviour
         {
             if(hit.distance <= velocityMetersPerSecond * Time.deltaTime)
             {
-                // reduce velocity
+                return hit.collider;
             }
         }
+        return null;
     }
 
     private void ChangeLane(float yLayer)
     {
-        // when Move()
-
-        // 1. calculate accurate distance in which car wants to change line
-        // 2. rotate by calucalted angle
-        // 3. move transform.up
-        // 4. when transform.position.y == wantedLayer, rotate to lane direction
-
-        // when Move2()
-
         // 1. calculate accurate distance in which car wants to change line
         // 2. move towards established point in new lane
         // 3. when in target position, change list of points and establish index of current point
@@ -150,15 +147,9 @@ public class SampleCarBehaviour : MonoBehaviour
         return velocityInKilometers / 3.6f;
     }
 
-    // method only for purpose of displaying velocity
-    private void EstablishVelocityInKilometers()
-    {
-        velocity = velocityMetersPerSecond * 3.6f;
-    }
-
     private void PrintVelocity()
     {
-        velocityText.text = velocity.ToString() + "km/h";
+        velocityText.text = GetVelocity().ToString() + "km/h";
     }
 
     public void SetUpLane(Transform nearestPoint, int index)

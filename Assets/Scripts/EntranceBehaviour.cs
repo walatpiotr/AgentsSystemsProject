@@ -77,7 +77,7 @@ public class EntranceBehaviour : MonoBehaviour
         // TODO
         // decide which car to spawn : car or truck
         var carBehaviourScript = carPrefab.GetComponent<SampleCarBehaviour>();
-        carBehaviourScript.velocity = 70f;
+        carBehaviourScript.SetVelocity(70f);
         carBehaviourScript.target = nearestPoint;
 
         if (direction == "E")

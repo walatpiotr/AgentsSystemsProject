@@ -220,7 +220,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   xLocation: 0
   yLocation: 0
-  velocity: 0
   acceleration: 0
   maxTargetVelocity: 80
   pathObjectToFollow: {fileID: 382885039}
