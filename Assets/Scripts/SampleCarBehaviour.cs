@@ -5,6 +5,12 @@ using TMPro;
 
 public class SampleCarBehaviour : MonoBehaviour
 {
+    public enum VehicleType
+    {
+        Car,
+        Truck
+    }
+    public VehicleType vehicleType;
     public float xLocation;
     public float yLayer;
     public float velocity;
