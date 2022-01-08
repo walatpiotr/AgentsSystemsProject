@@ -108,6 +108,19 @@ public class SampleCarBehaviour : MonoBehaviour
         }
     }
 
+    private void DetectCars()
+    {
+        Vector2 convertedDirection = direction == Directions.Right ? Vector2.right : Vector2.left;
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, convertedDirection);
+        if(hit.collider != null)
+        {
+            if(hit.distance <= velocityMetersPerSecond * Time.deltaTime)
+            {
+                // reduce velocity
+            }
+        }
+    }
+
     private void ChangeLane(float yLayer)
     {
         // when Move()
