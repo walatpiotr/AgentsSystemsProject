@@ -29,6 +29,7 @@ public class SampleCarBehaviour : MonoBehaviour
     public Transform target;
     public float targetX;
     public int nextNode;
+    public string finalDestination;
 
     private float velocityMetersPerSecond;
     private float nextWantedLane;
@@ -64,7 +65,11 @@ public class SampleCarBehaviour : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if(timeInRandomBreaking == 0f)
+        if(wantLineChange)
+        {
+            timeInRandomBreaking = 0f;
+        }
+        if(timeInRandomBreaking == 0f && !wantLineChange)
         {
             Accelerate();
         }
@@ -131,7 +136,7 @@ public class SampleCarBehaviour : MonoBehaviour
 
         // Part 2: Randomize
         // if speed higher than one unit (unified spacing)
-        if(velocityMetersPerSecond > UNIFIED_SPACING || timeInRandomBreaking > 0f)
+        if(!(wantLineChange) && (velocityMetersPerSecond > UNIFIED_SPACING || timeInRandomBreaking > 0f))
         {
             if(timeInRandomBreaking == 0f && UnityEngine.Random.value < 0.0003)
             {
@@ -170,7 +175,8 @@ public class SampleCarBehaviour : MonoBehaviour
         if ((transform.position == target.position) && (((nextNode+1) == listOfPoints.Count)||(nextNode-1) == -1))
         {
             // TODO
-            // search for new lane
+            // if not current lane type is Exit: search for new lane
+            // else: deinstantiate
         }
     }
 
@@ -194,17 +200,38 @@ public class SampleCarBehaviour : MonoBehaviour
 
     private void ChangeLane(float yLayer)
     {
-        // 1. calculate accurate distance in which car wants to change line
+        // 1. calculate accurate distance in which car wants to change line (once)
         // 2. move towards established point in new lane
-        // 3. when in target position, change list of points and establish index of current point
+        // 3. when in target position
+        //      a. change list of points and establish index of current point
+        //      b. set wantLineChange to false
     }
 
     private void LaneChangeDecission()
     {
-        // 1. decide which line is your target lane
-        // 2. check if there are cars that ride on this lane
-        // 3. check if there are in a safe distance
-        // 4. establish value of wantLineChange boolean
+        // 1. check if already changin (if wantLineChange == true)
+        // 2. decide if you want to change lane:
+        //      a. there's a slow car in front
+        //      b. you can come back to 'slower' lane
+        //      c. you have spotted your exit
+        if(SearchForExit())
+        {
+
+        }
+        // 3. decide which line is your target lane: set nextWantedLane
+        // 4. check if there are cars that ride on this lane
+        // 5. check if they are in a safe distance
+        // 6. establish value of wantLineChange boolean
+    }
+
+    private bool SearchForExit()
+    {
+        // 1. based on current lane number, determine angle of raycast
+        // 2. Raycast on higher Z layer
+        // 3. If collider detected and collider is exitPrefab collider:
+        //      4. If collider's parent description is equal to both current lane description and final destination:
+        //          5. return true
+        return false;
     }
 
     private void PrintVelocity()
