@@ -265,7 +265,7 @@ public class SampleCarBehaviour : MonoBehaviour
             int offset = (direction == Directions.Right) ? -1 : 1;
             var laneToTheRight = await FindAndSetUpNearestLaneAndPoint(offset);
             rightmost = laneToTheRight.Item1 == null;
-            Debug.Log(rightmost);
+            // Debug.Log(rightmost);
 
             // if c2 or (not c2 and not rightmost)
             if(exitSpotted || !rightmost)
@@ -340,9 +340,16 @@ public class SampleCarBehaviour : MonoBehaviour
         {
             return false;
         }
-        // 1. Raycast {on higher Z layer} 90 degrees to the right
-        // 2. If collider detected and collider is exitPrefab collider:
-        //      4. return true
+        Vector2 rightDirection = direction == Directions.Right ? Vector2.down : Vector2.up;
+        RaycastHit hit;
+        if(Physics.Raycast(new Vector3(transform.position.x, transform.position.y, 2), new Vector3(rightDirection.x, rightDirection.y, 2), out hit))
+        {
+            if(hit.collider.tag == "highwayLane")
+            {
+                Debug.Log("strzelłem");
+                return true;
+            }
+        }
         return false;
     }
 
