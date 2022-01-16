@@ -10,6 +10,13 @@ public class PointCreator : MonoBehaviour
     public float xPosition;
     public int carMaxVelocity;
     public int truckMaxVelocity;
+    public string description;
+    public enum LaneType
+    {
+        Road,
+        Exit
+    }
+    public LaneType type;
 
     private float unifiedSpacing = 10f;
 
