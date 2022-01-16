@@ -250,7 +250,7 @@ public class SampleCarBehaviour : MonoBehaviour
             // 3. check if you're on right-most lane
             rightmost = false;
             // if c2 or (not c2 and not rightmost)
-            if(exitSpotted != -1 || !rightmost)
+            if(exitSpotted || !rightmost)
             {
                 wantLineChange = true;
                 // set nextWantedLane
