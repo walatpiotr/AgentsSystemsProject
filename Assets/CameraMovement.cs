@@ -53,6 +53,11 @@ public class CameraMovement : MonoBehaviour
             followingCar = false;
             transform.position = new Vector3(transform.position.x, 0f, transform.position.z);
         }
+
+        if (followingCar)
+        {
+            FollowCar();
+        }
     }
 
     private void FixedUpdate()
@@ -65,10 +70,7 @@ public class CameraMovement : MonoBehaviour
         {
             MoveLeft();
         }
-        if (followingCar)
-        {
-            FollowCar();
-        }
+        
     }
 
     private void MoveLeft()
