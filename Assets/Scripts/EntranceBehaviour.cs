@@ -14,6 +14,7 @@ public class EntranceBehaviour : MonoBehaviour
     public GameObject truckPrefab;
 
     public string direction;
+    public string description;
 
     public float yLayer;
     public float xPosition;
@@ -22,7 +23,7 @@ public class EntranceBehaviour : MonoBehaviour
     private Transform nearestPoint;
     private int indexOfNearest = 0;
     private GameObject nearest;
-    private readonly string[] allDestinations = {"BIZ", "WIE", "LAG", "POL", "SKA", "TYN", "BIL", "BA2", "BA1", "RZE", "KAT"};
+    private readonly string[] allDestinations = {"KAT", "BA1", "BA2", "BIL", "TYN", "SKA", "POL", "LAG", "WIE", "BIZ", "RZE"};
     private const float UNIFIED_SPACING = 10f;
     private const float SPAWNING_SPEED = 70f;
 
@@ -92,22 +93,11 @@ public class EntranceBehaviour : MonoBehaviour
         }
         carBehaviourScript.target = nearestPoint;
 
-        int destination = UnityEngine.Random.Range(0, 10);
-        if(destination < 9)
-        {
-            carBehaviourScript.finalDestination = allDestinations[destination];
-        }
-        else
-        {
-            if(direction == "E")
-            {
-                carBehaviourScript.finalDestination = allDestinations[9];
-            }
-            else
-            {
-                carBehaviourScript.finalDestination = allDestinations[10];
-            }
-        }
+        int ownLocation = Array.IndexOf(allDestinations, description);
+        int minIndex = (direction == "E") ? (ownLocation + 1) : 0;
+        int maxIndex = (direction == "E") ? 11 : (ownLocation - 1);
+        int destination = UnityEngine.Random.Range(minIndex, maxIndex);
+        carBehaviourScript.finalDestination = allDestinations[destination];
 
         if (direction == "E")
         {

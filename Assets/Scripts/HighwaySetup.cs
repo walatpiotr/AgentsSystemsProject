@@ -63,6 +63,7 @@ public class HighwaySetup : MonoBehaviour
         else
         {
             var prefabScript = prefabType.GetComponent<EntranceBehaviour>();
+            prefabScript.description = description;
             prefabScript.yLayer = yLayer;
             prefabScript.xPosition = float.Parse(xPosition);
             prefabScript.carPrefab = carPrefab;
@@ -113,16 +114,16 @@ public class HighwaySetup : MonoBehaviour
                 return 8.0f;
 
             case "1W":
-                return 10.5f;
-
-            case "2W":
                 return 12.5f;
 
-            case "3W":
+            case "2W":
                 return 14.5f;
 
-            case "4W":
+            case "3W":
                 return 16.5f;
+
+            case "4W":
+                return 18.5f;
         }
         return 0.0f;
     }

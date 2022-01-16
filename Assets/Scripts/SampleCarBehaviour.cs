@@ -33,7 +33,6 @@ public class SampleCarBehaviour : MonoBehaviour
     public string finalDestination;
 
     private float velocityMetersPerSecond;
-    private float nextWantedLane;
     private bool exitImminent;
     private bool wantLineChange;
     private bool lockLaneChange;
@@ -42,9 +41,7 @@ public class SampleCarBehaviour : MonoBehaviour
     private float timeInRandomBreaking;
 
     private bool rightmost;
-
-    private GameObject targetLane;
-    private Transform targetNearestPoint;
+    private Transform laneChangingTarget;
 
     // Start is called before the first frame update
     void Start()
@@ -90,10 +87,6 @@ public class SampleCarBehaviour : MonoBehaviour
         if(!lockLaneChange)
         {
             LaneChangeDecission();
-            if (wantLineChange)
-            {
-                ChangeLane(nextWantedLane);
-            }
             PrintVelocity();
         }
         targetX = target.position.x;
@@ -174,7 +167,23 @@ public class SampleCarBehaviour : MonoBehaviour
 
         transform.position = Vector3.MoveTowards(transform.position, target.position, step);
 
-        if (transform.position == target.position && nextNode < listOfPoints.Count && nextNode >= 0)
+        if((transform.position == target.position) && ((direction == Directions.Left && nextNode == 0) || (direction == Directions.Right && nextNode == listOfPoints.Count - 1)))
+        {
+            var currLane = pathObjectToFollow.GetComponent<PointCreator>();
+            
+            if(currLane.type == PointCreator.LaneType.Exit || (currLane.type == PointCreator.LaneType.Road && ((currLane.description == "KAT" && finalDestination == "KAT") || (currLane.description == "RZE" && finalDestination == "RZE"))))
+            {
+                // deinstantiate
+                Destroy(gameObject);
+            }
+            else if (currLane.type == PointCreator.LaneType.Road)
+            {
+                // search for new lane and setupLane
+                var nearestTuple = await FindAndSetUpNearestLaneAndPoint(0);
+                SetUpLane(nearestTuple.Item1, nearestTuple.Item2, nearestTuple.Item3, true);
+            }
+        }
+        else if (transform.position == target.position && nextNode < listOfPoints.Count && nextNode >= 0)
         {
             if(direction == Directions.Left)
             {
@@ -186,23 +195,10 @@ public class SampleCarBehaviour : MonoBehaviour
             }
             target = listOfPoints.ElementAt(nextNode);
         }
-        else
+        if(transform.position == laneChangingTarget.position)
         {
-            // if not current lane type is Exit
-            if (pathObjectToFollow.GetComponent<PointCreator>().type == PointCreator.LaneType.Road)
-            {
-                // TODO
-                // search for new lane and setupLane
-
-                var nearestTuple = await FindAndSetUpNearestLaneAndPoint(0);
-                SetUpLane(nearestTuple.Item1, nearestTuple.Item2, nearestTuple.Item3);
-
-            }
-            else
-            {
-                // deinstantiate
-                Destroy(this);
-            }
+            wantLineChange = false;
+            laneChangingTarget = null;
         }
 
 
@@ -255,29 +251,37 @@ public class SampleCarBehaviour : MonoBehaviour
         // if(prev_c1)
         if(exitImminent)
         {
+            if(pathObjectToFollow.GetComponent<PointCreator>().type == PointCreator.LaneType.Exit)
+            {
+                lockLaneChange = true;
+                return;
+            }
+
             // c2
             bool exitSpotted = SearchForExit();
 
             // TODO
             // 3. check if you're on right-most lane
-            rightmost = false;
+            int offset = (direction == Directions.Right) ? -1 : 1;
+            var laneToTheRight = await FindAndSetUpNearestLaneAndPoint(offset);
+            rightmost = laneToTheRight.Item1 == null;
+            Debug.Log(rightmost);
+
             // if c2 or (not c2 and not rightmost)
             if(exitSpotted || !rightmost)
             {
                 wantLineChange = true;
 
+                Tuple<GameObject, Transform, int> nearestTuple;
                 if(direction == Directions.Right)
                 {
-                    var nearestTuple = await FindAndSetUpNearestLaneAndPoint(-1);
-                    targetLane = nearestTuple.Item1;
-                    targetNearestPoint = nearestTuple.Item2;
+                    nearestTuple = await FindAndSetUpNearestLaneAndPoint(-1);
                 }
                 else
                 {
-                    var nearestTuple = await FindAndSetUpNearestLaneAndPoint(1);
-                    targetLane = nearestTuple.Item1;
-                    targetNearestPoint = nearestTuple.Item2;
+                    nearestTuple = await FindAndSetUpNearestLaneAndPoint(1);
                 }
+                SetUpLane(nearestTuple.Item1, nearestTuple.Item2, nearestTuple.Item3);
             }          
         }
         else
@@ -347,7 +351,7 @@ public class SampleCarBehaviour : MonoBehaviour
         velocityText.text = GetVelocity().ToString() + "km/h";
     }
 
-    public void SetUpLane(GameObject lane, Transform nearestPoint, int index)
+    public void SetUpLane(GameObject lane, Transform nearestPoint, int index, bool isForward=false)
     {
         pathObjectToFollow = lane;
         listOfPoints = new List<Transform>();
@@ -365,6 +369,10 @@ public class SampleCarBehaviour : MonoBehaviour
         {
             nextNode = index - 1;
             target = listOfPoints.ElementAt(nextNode);
+        }
+        if(!isForward)
+        {
+            laneChangingTarget = target;
         }
 
         if(vehicleType == VehicleType.Car)
