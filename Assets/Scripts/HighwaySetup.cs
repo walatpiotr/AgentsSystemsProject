@@ -16,9 +16,9 @@ public class HighwaySetup : MonoBehaviour
     public GameObject carPrefab;
     public GameObject truckPrefab;
 
-    void Awake()
+    void Start()
     {
-        var listOfHighwayParts = new ListOfHighwayParts();
+        listOfHighwayParts = new ListOfHighwayParts();
         SetUpHighway();
     }
 
@@ -63,6 +63,7 @@ public class HighwaySetup : MonoBehaviour
         else
         {
             var prefabScript = prefabType.GetComponent<EntranceBehaviour>();
+            prefabScript.entranceType = infos[2] == "EE" ? EntranceBehaviour.EntranceType.End : EntranceBehaviour.EntranceType.Side;
             prefabScript.description = description;
             prefabScript.yLayer = yLayer;
             prefabScript.xPosition = float.Parse(xPosition);
@@ -77,6 +78,7 @@ public class HighwaySetup : MonoBehaviour
                 prefabScript.direction = "W";
             }
             var instantiated = Instantiate(prefabType, new Vector3(float.Parse(xPosition), yLayer, 0f), Quaternion.identity);
+            Debug.Log("tutaj" + prefabType);
         }
     }
 
@@ -333,6 +335,12 @@ public class ListOfHighwayParts
             // towards Katowice
             "1W-KAT-X1-0865-00000-090-80-R",
             "2W-KAT-X1-0865-00000-090-80-R",
+
+            // End entrances
+            "1E-KAT-EE-0000-00001-000-00-E",
+            "2E-KAT-EE-0000-00001-000-00-E",
+            "1W-RZE-EE-0000-28444-000-00-E",
+            "2W-RZE-EE-0000-28445-000-00-E"
         };
 
 }

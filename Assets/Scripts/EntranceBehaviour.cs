@@ -19,6 +19,13 @@ public class EntranceBehaviour : MonoBehaviour
     public float yLayer;
     public float xPosition;
 
+    public enum EntranceType
+    {
+        Side,
+        End
+    }
+    public EntranceType entranceType;
+
     private float timer;
     private Transform nearestPoint;
     private int indexOfNearest = 0;
@@ -66,11 +73,26 @@ public class EntranceBehaviour : MonoBehaviour
 
     void FixedUpdate()
     {
+        if(entranceType == EntranceType.End)
+        {
+            Debug.Log("Weszłem");
+            GetComponent<MeshRenderer>().enabled = false;
+        }
         if (timer == 0f)
         {
-            if(SimulationUtility.CheckLane(nearestPoint, SPAWNING_SPEED))
+            if(entranceType == EntranceType.Side)
             {
-                SpawnCar();
+                if(SimulationUtility.CheckLane(nearestPoint, SPAWNING_SPEED))
+                {
+                    SpawnCar();
+                }
+            }
+            else
+            {
+                if(SimulationUtility.CheckLane(nearestPoint, SPAWNING_SPEED, lookBackwards: false))
+                {
+                    SpawnCar();
+                }
             }
             SetupTimer();
         }

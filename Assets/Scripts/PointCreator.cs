@@ -43,7 +43,7 @@ public class PointCreator : MonoBehaviour
 
         var angle = Vector2.Angle(starting, ending);
 
-        Debug.Log(angle);
+        // Debug.Log(angle);
 
         CreatePointWithParameters(xPosition, yLayer);
 
