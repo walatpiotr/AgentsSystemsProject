@@ -174,6 +174,7 @@ public class SampleCarBehaviour : MonoBehaviour
             if(currLane.type == PointCreator.LaneType.Exit || (currLane.type == PointCreator.LaneType.Road && ((currLane.description == "KAT" && finalDestination == "KAT") || (currLane.description == "RZE" && finalDestination == "RZE"))))
             {
                 // deinstantiate
+                // Debug.Log(currLane.description + finalDestination);
                 Destroy(gameObject);
             }
             else if (currLane.type == PointCreator.LaneType.Road)
@@ -222,19 +223,6 @@ public class SampleCarBehaviour : MonoBehaviour
         }
     }
 
-    private void ChangeLane(float yLayer)
-    {
-        // 1. calculate accurate distance in which car wants to change line (once)
-        // 2. check if there are cars that ride on this lane
-        // 3. check if they are in a safe distance
-        // 4. move towards established point in new lane
-        // 5. when in target position
-        //      a. change list of points and establish index of current point
-        //      b. set wantLineChange to false
-        //      c. if exitImminent and new lane is exit:
-        //          - set lockLaneChange to true
-    }
-
     private async Task LaneChangeDecission()
     {
         // 1. check if already changing
@@ -260,7 +248,6 @@ public class SampleCarBehaviour : MonoBehaviour
             // c2
             bool exitSpotted = SearchForExit();
 
-            // TODO
             // 3. check if you're on right-most lane
             int offset = (direction == Directions.Right) ? -1 : 1;
             var laneToTheRight = await FindAndSetUpNearestLaneAndPoint(offset);
@@ -342,11 +329,10 @@ public class SampleCarBehaviour : MonoBehaviour
         }
         Vector2 rightDirection = direction == Directions.Right ? Vector2.down : Vector2.up;
         RaycastHit hit;
-        if(Physics.Raycast(new Vector3(transform.position.x, transform.position.y, 2), new Vector3(rightDirection.x, rightDirection.y, 2), out hit))
+        if(Physics.Raycast(new Vector3(transform.position.x, transform.position.y, 2), new Vector3(rightDirection.x, rightDirection.y, 0), out hit))
         {
             if(hit.collider.tag == "highwayLane")
             {
-                Debug.Log("strzelłem");
                 return true;
             }
         }

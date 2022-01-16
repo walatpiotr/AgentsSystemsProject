@@ -195,9 +195,9 @@ public class EntranceBehaviour : MonoBehaviour
     void TimerTick()
     {
         timer -= Time.deltaTime;
-        if(timer < 0f)
-        {
-            timer = 0f;
-        }
+        // if(timer < 0f)
+        // {
+        //     timer = 0f;
+        // }
     }
 }
