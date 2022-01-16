@@ -47,10 +47,27 @@ public class HighwaySetup : MonoBehaviour
         var truckMaxVelocity = infos[6];
         var prefabType = ReturnTypeOfObjectToInstantiate(infos[7]);
 
-        if (prefabType == highwayLanePrefab || prefabType == highwayExitPrefab)
+        if (prefabType == highwayLanePrefab)
         {
             var prefabScript = prefabType.GetComponent<PointCreator>();
-            prefabScript.type = infos[7] == "R" ? PointCreator.LaneType.Road : PointCreator.LaneType.Exit;
+            prefabScript.type = PointCreator.LaneType.Road;
+            prefabScript.yLayer = yLayer;
+            prefabScript.description = description;
+            prefabScript.distance = float.Parse(distance);
+            prefabScript.xPosition = float.Parse(xPosition);
+            prefabScript.carMaxVelocity = int.Parse(carMaxVelocity);
+            prefabScript.truckMaxVelocity = int.Parse(truckMaxVelocity);
+            //add tag if exit and
+            var instantiated = Instantiate(prefabType, new Vector3(float.Parse(xPosition), yLayer, 0f), Quaternion.identity);
+        }
+        else if (prefabType == highwayExitPrefab)
+        {
+            var boxCollider = prefabType.GetComponent<BoxCollider>();
+            boxCollider.center = new Vector3((float.Parse(distance)) / 2, 0, 2);
+            boxCollider.size = new Vector3(float.Parse(distance), 2, 1);
+
+            var prefabScript = prefabType.GetComponent<PointCreator>();
+            prefabScript.type = PointCreator.LaneType.Exit;
             prefabScript.yLayer = yLayer;
             prefabScript.description = description;
             prefabScript.distance = float.Parse(distance);

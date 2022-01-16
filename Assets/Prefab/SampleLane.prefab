@@ -50,6 +50,8 @@ MonoBehaviour:
   xPosition: 0
   carMaxVelocity: 90
   truckMaxVelocity: 80
+  description: 
+  type: 0
   listOfPoints: []
   meshMaterial: {fileID: 2100000, guid: c4c6afa8589576241a46eaeafff73da3, type: 2}
   prefabOfPoints: {fileID: 504372108782306628, guid: 126433c75ef27af4eacb0d3db7805561, type: 3}
