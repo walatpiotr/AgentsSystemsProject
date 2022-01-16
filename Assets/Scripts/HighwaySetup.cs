@@ -78,7 +78,6 @@ public class HighwaySetup : MonoBehaviour
                 prefabScript.direction = "W";
             }
             var instantiated = Instantiate(prefabType, new Vector3(float.Parse(xPosition), yLayer, 0f), Quaternion.identity);
-            Debug.Log("tutaj" + prefabType);
         }
     }
 

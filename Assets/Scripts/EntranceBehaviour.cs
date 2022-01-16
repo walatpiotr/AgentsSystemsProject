@@ -41,6 +41,10 @@ public class EntranceBehaviour : MonoBehaviour
 
     private async Task Start()
     {
+        if(entranceType == EntranceType.End)
+        {
+            GetComponent<MeshRenderer>().enabled = false;
+        }
         var listOfLanes = GameObject.FindGameObjectsWithTag("highwayLane");
         nearest = listOfLanes[0];
         nearestPoint = await FindNearest(listOfLanes);
@@ -73,11 +77,6 @@ public class EntranceBehaviour : MonoBehaviour
 
     void FixedUpdate()
     {
-        if(entranceType == EntranceType.End)
-        {
-            Debug.Log("Weszłem");
-            GetComponent<MeshRenderer>().enabled = false;
-        }
         if (timer == 0f)
         {
             if(entranceType == EntranceType.Side)
