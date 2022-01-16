@@ -16,7 +16,6 @@ public class SampleCarBehaviour : MonoBehaviour
     public VehicleType vehicleType;
     public float xLocation;
     public float yLayer;
-    public float acceleration;
     public float maxTargetVelocity;
     public TextMeshProUGUI velocityText;
     public BoxCollider2D collider;
@@ -367,7 +366,16 @@ public class SampleCarBehaviour : MonoBehaviour
             nextNode = index - 1;
             target = listOfPoints.ElementAt(nextNode);
         }
-        
+
+        if(vehicleType == VehicleType.Car)
+        {
+            maxTargetVelocity = pathObjectToFollow.GetComponent<PointCreator>().carMaxVelocity;
+        }
+        else
+        {
+            maxTargetVelocity = pathObjectToFollow.GetComponent<PointCreator>().truckMaxVelocity;
+        }
+
     }
 
     private async Task<Tuple<GameObject, Transform, int>> FindAndSetUpNearestLaneAndPoint(int layerChange)
