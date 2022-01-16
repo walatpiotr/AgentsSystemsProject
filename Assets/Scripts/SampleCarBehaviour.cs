@@ -29,10 +29,13 @@ public class SampleCarBehaviour : MonoBehaviour
     public Transform target;
     public float targetX;
     public int nextNode;
+    public string finalDestination;
 
     private float velocityMetersPerSecond;
     private float nextWantedLane;
+    private bool exitImminent;
     private bool wantLineChange;
+    private bool lockLaneChange;
     private const float UNIFIED_SPACING = 10f;
 
     private float timeInRandomBreaking;
@@ -60,23 +63,33 @@ public class SampleCarBehaviour : MonoBehaviour
         }
 
         timeInRandomBreaking = 0f;
+
+        wantLineChange = false;
+        exitImminent = false;
+        lockLaneChange = false;
     }
 
     private void FixedUpdate()
     {
-        if(timeInRandomBreaking == 0f)
+        if(wantLineChange)
+        {
+            timeInRandomBreaking = 0f;
+        }
+        if(timeInRandomBreaking == 0f && !wantLineChange)
         {
             Accelerate();
         }
         SlowDown();
         Move();
-        LaneChangeDecission();
-        if (wantLineChange)
+        if(!lockLaneChange)
         {
-            ChangeLane(nextWantedLane);
+            LaneChangeDecission();
+            if (wantLineChange)
+            {
+                ChangeLane(nextWantedLane);
+            }
+            PrintVelocity();
         }
-        PrintVelocity();
-
         targetX = target.position.x;
     }
 
@@ -131,7 +144,7 @@ public class SampleCarBehaviour : MonoBehaviour
 
         // Part 2: Randomize
         // if speed higher than one unit (unified spacing)
-        if(velocityMetersPerSecond > UNIFIED_SPACING || timeInRandomBreaking > 0f)
+        if(!(wantLineChange) && (velocityMetersPerSecond > UNIFIED_SPACING || timeInRandomBreaking > 0f))
         {
             if(timeInRandomBreaking == 0f && UnityEngine.Random.value < 0.0003)
             {
@@ -169,8 +182,17 @@ public class SampleCarBehaviour : MonoBehaviour
         }
         if ((transform.position == target.position) && (((nextNode+1) == listOfPoints.Count)||(nextNode-1) == -1))
         {
-            // TODO
-            // search for new lane
+            // if not current lane type is Exit
+            if(pathObjectToFollow.GetComponent<PointCreator>().type == PointCreator.LaneType.Road)
+            {
+                // TODO
+                // search for new lane and setupLane
+            }
+            else
+            {
+                // deinstantiate
+                Destroy(this);
+            }
         }
     }
 
@@ -194,17 +216,67 @@ public class SampleCarBehaviour : MonoBehaviour
 
     private void ChangeLane(float yLayer)
     {
-        // 1. calculate accurate distance in which car wants to change line
-        // 2. move towards established point in new lane
-        // 3. when in target position, change list of points and establish index of current point
+        // 1. calculate accurate distance in which car wants to change line (once)
+        // 2. check if there are cars that ride on this lane
+        // 3. check if they are in a safe distance
+        // 4. move towards established point in new lane
+        // 5. when in target position
+        //      a. change list of points and establish index of current point
+        //      b. set wantLineChange to false
+        //      c. if exitImminent and new lane is exit:
+        //          - set lockLaneChange to true
     }
 
     private void LaneChangeDecission()
     {
-        // 1. decide which line is your target lane
-        // 2. check if there are cars that ride on this lane
-        // 3. check if there are in a safe distance
-        // 4. establish value of wantLineChange boolean
+        // 1. check if already changing
+        if(wantLineChange == true)
+        {
+            return;
+        }
+        // 2. decide if you want to change lane:
+        //      a. there's a slow car in front
+        //      b. you can come back to 'slower' lane
+        //      c1. next exit is your exit
+        //      c2. you have spotted your exit
+        
+        // if(prev_c1)
+        if(exitImminent)
+        {
+            // c2
+            bool exitSpotted = SearchForExit();
+
+            // TODO
+            // 3. check if you're on right-most lane
+            rightmost = false;
+            // if c2 or (not c2 and not rightmost)
+            if(exitSpotted || !rightmost)
+            {
+                wantLineChange = true;
+                // set nextWantedLane
+            }          
+        }
+        else
+        {
+            // calculate a, b, c1
+            //if(a || b || c1)
+            wantLineChange = true;
+            // 3. decide which line is your target lane: set nextWantedLane
+            //if c1 set exitImminent true
+        }
+    }
+
+    private bool SearchForExit()
+    {
+        // if next exit is not yours, don't look for exit
+        if(!exitImminent)
+        {
+            return false;
+        }
+        // 1. Raycast {on higher Z layer} 90 degrees to the right
+        // 2. If collider detected and collider is exitPrefab collider:
+        //      4. return true
+        return false;
     }
 
     private void PrintVelocity()

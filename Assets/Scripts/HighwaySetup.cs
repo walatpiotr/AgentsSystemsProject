@@ -50,7 +50,9 @@ public class HighwaySetup : MonoBehaviour
         if (prefabType == highwayLanePrefab || prefabType == highwayExitPrefab)
         {
             var prefabScript = prefabType.GetComponent<PointCreator>();
+            prefabScript.type = infos[7] == "R" ? PointCreator.LaneType.Road : PointCreator.LaneType.Exit;
             prefabScript.yLayer = yLayer;
+            prefabScript.description = description;
             prefabScript.distance = float.Parse(distance);
             prefabScript.xPosition = float.Parse(xPosition);
             prefabScript.carMaxVelocity = int.Parse(carMaxVelocity);
@@ -79,11 +81,6 @@ public class HighwaySetup : MonoBehaviour
 
     private GameObject ReturnTypeOfObjectToInstantiate(string type)
     {
-        if (type == "E")
-        {
-            Debug.Log("E");
-        }
-
         switch (type)
         {
             case "I":

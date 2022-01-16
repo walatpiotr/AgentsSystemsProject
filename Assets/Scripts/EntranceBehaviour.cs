@@ -21,6 +21,7 @@ public class EntranceBehaviour : MonoBehaviour
     private Transform nearestPoint;
     private int indexOfNearest = 0;
     private GameObject nearest;
+    private readonly string[] allDestinations = {"BIZ", "WIE", "LAG", "POL", "SKA", "TYN", "BIL", "BA2", "BA1", "RZE", "KAT"};
     private const float UNIFIED_SPACING = 10f;
     private const float SPAWNING_SPEED = 70f;
 
@@ -115,7 +116,7 @@ public class EntranceBehaviour : MonoBehaviour
     void SpawnCar()
     {
         // TODO
-        // decide which car to spawn : car or truck - determine probability
+        // determine probability
         SampleCarBehaviour carBehaviourScript;
         if(UnityEngine.Random.value >= 0.3)
         {
@@ -126,6 +127,23 @@ public class EntranceBehaviour : MonoBehaviour
             carBehaviourScript = truckPrefab.GetComponent<SampleCarBehaviour>();
         }
         carBehaviourScript.target = nearestPoint;
+
+        int destination = UnityEngine.Random.Range(0, 10);
+        if(destination < 9)
+        {
+            carBehaviourScript.finalDestination = allDestinations[destination];
+        }
+        else
+        {
+            if(direction == "E")
+            {
+                carBehaviourScript.finalDestination = allDestinations[9];
+            }
+            else
+            {
+                carBehaviourScript.finalDestination = allDestinations[10];
+            }
+        }
 
         if (direction == "E")
         {
