@@ -81,13 +81,15 @@ public class SampleCarBehaviour : MonoBehaviour
         }
         SlowDown();
         Move();
-        LaneChangeDecission();
-        if (wantLineChange)
+        if(!lockLaneChange)
         {
-            ChangeLane(nextWantedLane);
+            LaneChangeDecission();
+            if (wantLineChange)
+            {
+                ChangeLane(nextWantedLane);
+            }
+            PrintVelocity();
         }
-        PrintVelocity();
-
         targetX = target.position.x;
     }
 
@@ -214,18 +216,15 @@ public class SampleCarBehaviour : MonoBehaviour
 
     private void ChangeLane(float yLayer)
     {
-        if(!lockLaneChange)
-        {
-            // 1. calculate accurate distance in which car wants to change line (once)
-            // 2. check if there are cars that ride on this lane
-            // 3. check if they are in a safe distance
-            // 4. move towards established point in new lane
-            // 5. when in target position
-            //      a. change list of points and establish index of current point
-            //      b. set wantLineChange to false
-            //      c. if exitImminent and new lane is exit:
-            //          - set lockLaneChange to true
-        }
+        // 1. calculate accurate distance in which car wants to change line (once)
+        // 2. check if there are cars that ride on this lane
+        // 3. check if they are in a safe distance
+        // 4. move towards established point in new lane
+        // 5. when in target position
+        //      a. change list of points and establish index of current point
+        //      b. set wantLineChange to false
+        //      c. if exitImminent and new lane is exit:
+        //          - set lockLaneChange to true
     }
 
     private void LaneChangeDecission()
