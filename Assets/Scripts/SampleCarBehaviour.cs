@@ -3,6 +3,8 @@ using System.Linq;
 using System;
 using UnityEngine;
 using TMPro;
+using System.Threading.Tasks;
+using Assets.Scripts;
 
 public class SampleCarBehaviour : MonoBehaviour
 {
@@ -39,6 +41,11 @@ public class SampleCarBehaviour : MonoBehaviour
     private const float UNIFIED_SPACING = 10f;
 
     private float timeInRandomBreaking;
+
+    private bool rightmost;
+
+    private GameObject targetLane;
+    private Transform targetNearestPoint;
 
     // Start is called before the first frame update
     void Start()
@@ -162,13 +169,13 @@ public class SampleCarBehaviour : MonoBehaviour
         }
     }
 
-    private void Move()
+    private async Task Move()
     {
         float step = velocityMetersPerSecond * Time.deltaTime; // calculate distance to move
 
         transform.position = Vector3.MoveTowards(transform.position, target.position, step);
 
-        if ((transform.position == target.position) && (((nextNode+1) < listOfPoints.Count) || (nextNode - 1) == -1))
+        if (transform.position == target.position && nextNode < listOfPoints.Count && nextNode >= 0)
         {
             if(direction == Directions.Left)
             {
@@ -180,13 +187,17 @@ public class SampleCarBehaviour : MonoBehaviour
             }
             target = listOfPoints.ElementAt(nextNode);
         }
-        if ((transform.position == target.position) && (((nextNode+1) == listOfPoints.Count)||(nextNode-1) == -1))
+        else
         {
             // if not current lane type is Exit
-            if(pathObjectToFollow.GetComponent<PointCreator>().type == PointCreator.LaneType.Road)
+            if (pathObjectToFollow.GetComponent<PointCreator>().type == PointCreator.LaneType.Road)
             {
                 // TODO
                 // search for new lane and setupLane
+
+                var nearestTuple = await FindAndSetUpNearestLaneAndPoint(0);
+                SetUpLane(nearestTuple.Item1, nearestTuple.Item2, nearestTuple.Item3);
+
             }
             else
             {
@@ -194,6 +205,8 @@ public class SampleCarBehaviour : MonoBehaviour
                 Destroy(this);
             }
         }
+
+
     }
 
     private RaycastHit2D DetectCars()
@@ -227,7 +240,7 @@ public class SampleCarBehaviour : MonoBehaviour
         //          - set lockLaneChange to true
     }
 
-    private void LaneChangeDecission()
+    private async Task LaneChangeDecission()
     {
         // 1. check if already changing
         if(wantLineChange == true)
@@ -253,16 +266,67 @@ public class SampleCarBehaviour : MonoBehaviour
             if(exitSpotted || !rightmost)
             {
                 wantLineChange = true;
-                // set nextWantedLane
+
+                if(direction == Directions.Right)
+                {
+                    var nearestTuple = await FindAndSetUpNearestLaneAndPoint(-1);
+                    targetLane = nearestTuple.Item1;
+                    targetNearestPoint = nearestTuple.Item2;
+                }
+                else
+                {
+                    var nearestTuple = await FindAndSetUpNearestLaneAndPoint(1);
+                    targetLane = nearestTuple.Item1;
+                    targetNearestPoint = nearestTuple.Item2;
+                }
             }          
         }
         else
         {
             // calculate a, b, c1
-            //if(a || b || c1)
-            wantLineChange = true;
-            // 3. decide which line is your target lane: set nextWantedLane
-            //if c1 set exitImminent true
+            // if(a || b || c1)
+
+            if (CheckIfNextExitIsDestination())
+            {
+                exitImminent = true;
+                wantLineChange = false;
+            }
+            else
+            {
+                Tuple<GameObject, Transform, int> nearestTuple;
+                if (direction == Directions.Right)
+                {
+                    nearestTuple = await FindAndSetUpNearestLaneAndPoint(1);
+                }
+                else
+                {
+                    nearestTuple = await FindAndSetUpNearestLaneAndPoint(-1);
+                }
+
+                if (SimulationUtility.CheckLane(nearestTuple.Item2, GetVelocity(), 3))
+                {
+                    SetUpLane(nearestTuple.Item1, nearestTuple.Item2, nearestTuple.Item3);
+
+                    wantLineChange = true;
+                }
+                else
+                {
+                    if (direction == Directions.Right)
+                    {
+                        nearestTuple = await FindAndSetUpNearestLaneAndPoint(-1);
+                    }
+                    else
+                    {
+                        nearestTuple = await FindAndSetUpNearestLaneAndPoint(1);
+                    }
+                    if (SimulationUtility.CheckLane(nearestTuple.Item2, GetVelocity(), 3))
+                    {
+                        SetUpLane(nearestTuple.Item1, nearestTuple.Item2, nearestTuple.Item3);
+                        wantLineChange = true;
+                    }
+                }
+
+            }
         }
     }
 
@@ -284,13 +348,86 @@ public class SampleCarBehaviour : MonoBehaviour
         velocityText.text = GetVelocity().ToString() + "km/h";
     }
 
-    public void SetUpLane(Transform nearestPoint, int index)
+    public void SetUpLane(GameObject lane, Transform nearestPoint, int index)
     {
-        pathObjectToFollow = nearestPoint.parent.gameObject;
+        pathObjectToFollow = lane;
+        listOfPoints = new List<Transform>();
         foreach (Transform child in pathObjectToFollow.transform)
         {
             listOfPoints.Add(child);
         }
-        nextNode = index+1;
+
+        if(direction == Directions.Right)
+        {
+            nextNode = index+1;
+            target = listOfPoints.ElementAt(nextNode);
+        }
+        else
+        {
+            nextNode = index - 1;
+            target = listOfPoints.ElementAt(nextNode);
+        }
+        
+    }
+
+    private async Task<Tuple<GameObject, Transform, int>> FindAndSetUpNearestLaneAndPoint(int layerChange)
+    {
+        var listOfLanes = GameObject.FindGameObjectsWithTag("highwayLane");
+        GameObject nearestLane = null;
+        float distanceToLane = 100000000000f;
+        float distanceToNode = 100000000000f;
+        Transform nearestPoint = null;
+
+        foreach (var lane in listOfLanes)
+        {
+            if(lane.transform.position.y == transform.position.y+(layerChange)*2 && lane != pathObjectToFollow)
+            {
+                if(direction == Directions.Right)
+                {
+                    if(lane.transform.position.x >= transform.position.x)
+                    {
+                        var tempDistance = Vector3.Distance(lane.transform.position, transform.position);
+                        if (tempDistance < distanceToLane)
+                        {
+                            distanceToLane = tempDistance;
+                            nearestLane = lane;
+                        }
+                    }
+                }
+                else
+                {
+                    if (lane.transform.position.x <= transform.position.x)
+                    {
+                        var tempDistance = Vector3.Distance(lane.transform.position, transform.position);
+                        if (tempDistance < distanceToLane)
+                        {
+                            distanceToLane = tempDistance;
+                            nearestLane = lane;
+                        }
+                    }
+                }
+            }
+        }
+
+        int index = 0;
+        int i = 0;
+        foreach (Transform node in nearestLane.transform)
+        {
+            var tempDistance = Vector3.Distance(node.transform.position, transform.position);
+            if (tempDistance < distanceToNode)
+            {
+                distanceToNode = tempDistance;
+                nearestPoint = node;
+                index = i;
+            }
+            i++;
+        }
+
+        return new Tuple<GameObject, Transform, int>(nearestLane, nearestPoint, index);
+    }
+
+    private bool CheckIfNextExitIsDestination()
+    {
+        return pathObjectToFollow.GetComponent<PointCreator>().description == finalDestination;
     }
 }
